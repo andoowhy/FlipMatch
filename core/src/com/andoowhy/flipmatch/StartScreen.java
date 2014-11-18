@@ -9,7 +9,7 @@ public class StartScreen implements Screen
 {
     final FlipMatch game;
 
-    OrthographicCamera camera;
+    private OrthographicCamera camera;
 
     public StartScreen( final FlipMatch game )
     {
@@ -28,8 +28,6 @@ public class StartScreen implements Screen
 
         game.batch.begin();
         {
-            //game.font.draw( game.batch, "Welcome to Drop!!! ", 100, 150 );
-            //game.font.draw( game.batch, "Tap anywhere to begin!", 100, 100 );
             game.drawFontFromCenterRelative( game.batch
                                             ,game.fontBlk100
                                             ,"FlipMatch"
@@ -46,11 +44,11 @@ public class StartScreen implements Screen
         }
         game.batch.end();
 
-//        if ( Gdx.input.isTouched() )
-//        {
-//            game.setScreen( game.startScreen );
-//            dispose();
-//        }
+        if ( Gdx.input.isTouched() )
+        {
+            game.setScreen( game.controlsScreen );
+            dispose();
+        }
     }
 
     @Override
