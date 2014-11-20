@@ -19,10 +19,12 @@ public class FlipMatch extends Game
 
 	//Textures
 	public Texture unflippedFace;
+	public Texture flippedFace;
 
 	//Screens
 	public StartScreen startScreen;
 	public ControlsScreen controlsScreen;
+	public ControlsScreen2 controlsScreen2;
 
 	public SpriteBatch batch;
 	
@@ -39,14 +41,16 @@ public class FlipMatch extends Game
 		//Init Screens
 		startScreen = new StartScreen( this );
 		controlsScreen = new ControlsScreen( this );
+		controlsScreen2 = new ControlsScreen2( this );
 
 		//Init Textures
 		unflippedFace = new Texture( Gdx.files.internal("Unflipped.png") );
+		flippedFace = new Texture( Gdx.files.internal("flipped.png") );
 
 		//Batch
 		batch = new SpriteBatch();
 
-		this.setScreen( controlsScreen );
+		this.setScreen( startScreen );
 
 
 	}

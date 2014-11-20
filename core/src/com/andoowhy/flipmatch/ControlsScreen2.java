@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 
-public class ControlsScreen implements Screen
+public class ControlsScreen2 implements Screen
 {
     final FlipMatch game;
 
@@ -18,14 +18,30 @@ public class ControlsScreen implements Screen
     private FlipCard[] flipCards = new FlipCard[16];
     private int flippedCount = 0;
 
-    public ControlsScreen( final FlipMatch game )
+    public ControlsScreen2( final FlipMatch game )
     {
         this.game = game;
+        /*
         camera = new OrthographicCamera();
         camera.setToOrtho( false, game.screenWidth, game.screenHeight );
 
+        //Set Up Random Card Colors
+        Color[] colors = new Color[16];
+        for( int i = 0; i < colors.length; i += 2 )
+        {//Initialize colors
+            Color randomColor = HSL.toRGB( MathUtils.random( 0f, 1f ), 0f, 0.15f , 1f );
+            colors[i] = randomColor;
+            colors[i+1] = randomColor;
+        }
+        for (int i = 0; i < colors.length; i++)
+        {//Fisher–Yates Shuffle colors
+            int r = i + MathUtils.random(0, colors.length - i );
+            Color tmp = colors[i];
+            colors[i] = colors[r];
+            colors[r] = tmp;
+        }
+
         //Set up Cards
-        Color randomColor = HSL.toRGB( MathUtils.random( 0f, 1f ), 0.3f, 0.9f , 1f );
         for( int i = 0; i < 4; i++ )
         {
             for( int j = 0; j < 4; j++ )
@@ -34,14 +50,17 @@ public class ControlsScreen implements Screen
                         game
                         ,i * FlipCard.width + i * FlipCard.margin + FlipCard.xOffset
                         ,j * FlipCard.height + j* FlipCard.margin + FlipCard.yOffset
-                        ,randomColor
+                        ,colors[4 * i + j]
                 );
             }
         }
+        */
     }
     @Override
     public void render( float delta )
     {
+        /*
+
         //
         // Update
         //
@@ -52,22 +71,14 @@ public class ControlsScreen implements Screen
             touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
             camera.unproject(touchPos);
 
-            if( flippedCount < 2 )
+            //Check if any card has been touched
+            for( FlipCard flipCard : flipCards )
             {
-                //Check if any card has been touched
-                for( FlipCard flipCard : flipCards )
+                if( flipCard.isTouched( touchPos.x, touchPos.y ) && !flipCard.flipped )
                 {
-                    if( flipCard.isTouched( touchPos.x, touchPos.y ) && !flipCard.flipped )
-                    {
-                        flipCard.flipped = true;
-                        flippedCount ++;
-                    }
+                    flipCard.flipped = true;
+                    flippedCount ++;
                 }
-            }
-            else
-            {
-                game.setScreen( game.controlsScreen2 );
-                dispose();
             }
         }
 
@@ -119,6 +130,8 @@ public class ControlsScreen implements Screen
             //Buttons
         }
         game.batch.end();
+
+        */
     }
 
     @Override
