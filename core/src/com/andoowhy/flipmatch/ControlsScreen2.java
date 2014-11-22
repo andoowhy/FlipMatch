@@ -115,7 +115,7 @@ public class ControlsScreen2 implements Screen
             }
             else if ( flippedCount > 2 )
             {
-                game.setScreen( game.startScreen );
+                game.setScreen( game.controlsScreen3 );
                 dispose();
             }
         }
