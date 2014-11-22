@@ -27,6 +27,10 @@ public class FlipMatch extends Game
 	public ControlsScreen2 controlsScreen2;
 
 	public SpriteBatch batch;
+
+	//Color Defaults
+	public float cardSaturation = 0.8f;
+	public float cardLightness = 0.8f;
 	
 	@Override
 	public void create()

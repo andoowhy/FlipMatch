@@ -25,7 +25,11 @@ public class ControlsScreen implements Screen
         camera.setToOrtho( false, game.screenWidth, game.screenHeight );
 
         //Set up Cards
-        Color randomColor = HSL.toRGB( MathUtils.random( 0f, 1f ), 0.3f, 0.9f , 1f );
+        Color randomColor = HSL.toRGB( MathUtils.random( 0f, 1f )
+                                        ,game.cardSaturation
+                                        ,game.cardLightness
+                                        ,1f
+        );
         for( int i = 0; i < 4; i++ )
         {
             for( int j = 0; j < 4; j++ )
@@ -45,7 +49,7 @@ public class ControlsScreen implements Screen
         //
         // Update
         //
-        if ( Gdx.input.isTouched() )
+        if ( Gdx.input.justTouched() )
         {
             //Get touch coords and convert them to game space
             Vector3 touchPos = new Vector3();
@@ -154,6 +158,10 @@ public class ControlsScreen implements Screen
     @Override
     public void dispose()
     {
-
+        flippedCount = 0;
+        for( FlipCard flipCard : flipCards )
+        {
+            flipCard.flipped = false;
+        }
     }
 }

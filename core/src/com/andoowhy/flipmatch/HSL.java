@@ -1,60 +1,67 @@
 package com.andoowhy.flipmatch;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.MathUtils;
 
 public class HSL
 {
-    public static Color toRGB(float hue, float saturation, float value, float alpha)
+    public static Color toRGB(float h, float s, float l, float alpha)
     {
-        float r, g, b;
+        if (s <0.0f || s > 100.0f)
+        {
+            String message = "Color parameter outside of expected range - Saturation";
+            throw new IllegalArgumentException( message );
+        }
 
-        int h = (int)(hue * 6);
-        float f = hue * 6 - h;
-        float p = value * (1 - saturation);
-        float q = value * (1 - f * saturation);
-        float t = value * (1 - (1 - f) * saturation);
+        if (l <0.0f || l > 100.0f)
+        {
+            String message = "Color parameter outside of expected range - Luminance";
+            throw new IllegalArgumentException( message );
+        }
 
-        if (h == 0)
+        if (alpha <0.0f || alpha > 1.0f)
         {
-            r = value;
-            g = t;
-            b = p;
+            String message = "Color parameter outside of expected range - Alpha";
+            throw new IllegalArgumentException( message );
         }
-        else if (h == 1)
-        {
-            r = q;
-            g = value;
-            b = p;
-        }
-        else if (h == 2)
-        {
-            r = p;
-            g = value;
-            b = t;
-        }
-        else if (h == 3)
-        {
-            r = p;
-            g = q;
-            b = value;
-        }
-        else if (h == 4)
-        {
-            r = t;
-            g = p;
-            b = value;
-        }
-        else if (h == 5)
-        {
-            r = value;
-            g = p;
-            b = q;
-        }
+
+        float q = 0;
+
+        if (l < 0.5)
+            q = l * (1 + s);
         else
+            q = (l + s) - (s * l);
+
+        float p = 2 * l - q;
+
+        float r = Math.max(0, HueToRGB(p, q, h + (1.0f / 3.0f)));
+        float g = Math.max(0, HueToRGB(p, q, h));
+        float b = Math.max(0, HueToRGB(p, q, h - (1.0f / 3.0f)));
+
+        return new Color(r, g, b, alpha);
+    }
+
+    private static float HueToRGB(float p, float q, float h)
+    {
+        if (h < 0) h += 1;
+
+        if (h > 1 ) h -= 1;
+
+        if (6 * h < 1)
         {
-            throw new RuntimeException("Something went wrong when converting from HSV to RGB. Input was " + hue + ", " + saturation + ", " + value);
+            return p + ((q - p) * 6 * h);
         }
 
-        return new Color( r, g, b, alpha );
+        if (2 * h < 1 )
+        {
+            return  q;
+        }
+
+        if (3 * h < 2)
+        {
+            return p + ( (q - p) * 6 * ((2.0f / 3.0f) - h) );
+        }
+
+        return p;
     }
 }

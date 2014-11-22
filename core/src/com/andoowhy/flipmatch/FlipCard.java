@@ -17,6 +17,7 @@ public class FlipCard
     public float x;
     public float y;
     public boolean flipped = false;
+
     public Color flippedColor;
 
     public FlipCard( final FlipMatch game, float x, float y, Color color )
