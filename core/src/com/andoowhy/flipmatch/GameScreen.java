@@ -35,11 +35,12 @@ public class GameScreen implements Screen
     private Label elapsedLabel;
     private float elapsedTime;
     private Label pausedLabel;
+    private Label youWonLabel;
 
     //Textures
     private Texture pauseMenuBG;
 
-    private boolean paused = true;
+    private boolean paused = false;
 
     public GameScreen( final FlipMatch game )
     {
@@ -96,6 +97,8 @@ public class GameScreen implements Screen
                 {
                     lastFlipped.get( i ).flipped = false;
                 }
+                lastFlipped.remove( lastFlipped.size() - 1 );
+                lastFlipped.remove( lastFlipped.size() - 1 );
             }
         };
 
@@ -165,17 +168,30 @@ public class GameScreen implements Screen
         }
         {
             String pausedText = "Paused";
-            BitmapFont.TextBounds bounds = game.fontReg32.getBounds( pausedText );
+            BitmapFont.TextBounds bounds = game.fontBlk100.getBounds( pausedText );
             pausedLabel = new Label(
                     game
-                    ,game.fontReg32
+                    ,game.fontBlk100
                     ,pausedText
                     ,game.screenWidth * 0.5f - bounds.width / 2f
                     ,game.screenHeight * 0.7f - bounds.height / 2f
             );
         }
 
-
+        //
+        // You Won Menu
+        //
+        {
+            String youWonText = "You Won!";
+            BitmapFont.TextBounds bounds = game.fontBlk100.getBounds( youWonText );
+            youWonLabel = new Label(
+                    game
+                    ,game.fontBlk100
+                    ,youWonText
+                    ,game.screenWidth * 0.5f - bounds.width / 2f
+                    ,game.screenHeight * 0.7f - bounds.height / 2f
+            );
+        }
 
     }
     @Override
@@ -184,20 +200,21 @@ public class GameScreen implements Screen
         //
         // Update
         //
+
         if ( !paused )
         {
             elapsedTime += delta;
         }
 
-        if( !flippedTimerTask.isScheduled() )
+        if( !flippedTimerTask.isScheduled() && Gdx.input.justTouched() )
         {
-            if ( Gdx.input.justTouched() )
-            {
-                //Get touch coords and convert them to game space
-                Vector3 touchPos = new Vector3();
-                touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-                camera.unproject(touchPos);
+            //Get touch coords and convert them to game space
+            Vector3 touchPos = new Vector3();
+            touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+            camera.unproject(touchPos);
 
+            if( lastFlipped.size() != flipCards.length )
+            {
                 if( !paused )
                 {   //Check if any card has been touched
                     for( FlipCard flipCard : flipCards )
@@ -208,12 +225,13 @@ public class GameScreen implements Screen
                             lastFlipped.add( flipCard );
 
                             //Check if an even number of cards has been flipped
-                            if( lastFlipped.size() % 2 == 0 )
+                            if( lastFlipped.size() > 0 && lastFlipped.size() % 2 == 0 )
                             {
                                 //Check if the last two flipped cards are not the same color
                                 int end = lastFlipped.size() - 1;
                                 if( lastFlipped.get( end ).flippedColor != lastFlipped.get( end - 1 ).flippedColor )
                                 {
+                                    //remove the last two cards
                                     Timer.schedule( flippedTimerTask, 0.8f );
                                 }
                             }
@@ -244,6 +262,13 @@ public class GameScreen implements Screen
                     {
                         dispose();
                     }
+                }
+            }
+            else if( lastFlipped.size() == flipCards.length )
+            {
+                if( restartButton.isTouched( touchPos.x, touchPos.y ) )
+                {
+                    dispose();
                 }
             }
         }
@@ -277,7 +302,18 @@ public class GameScreen implements Screen
             questionMarkButton.draw( game.batch );
             pauseButton.draw( game.batch );
 
-            if( paused )
+            if( lastFlipped.size() == flipCards.length )
+            {
+                {
+                    Color oldColor = game.batch.getColor();
+                    game.batch.setColor( oldColor.r, oldColor.g, oldColor.b, 0.9f );
+                    game.batch.draw( pauseMenuBG, 0f, 0f );
+                    game.batch.setColor( oldColor );
+                }
+                youWonLabel.draw( game.batch );
+                restartButton.draw( game.batch );
+            }
+            else if( paused )
             {
                 {
                     Color oldColor = game.batch.getColor();
