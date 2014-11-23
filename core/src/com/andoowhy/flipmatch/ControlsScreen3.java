@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector3;
 
 public class ControlsScreen3 implements Screen
 {
@@ -69,7 +68,7 @@ public class ControlsScreen3 implements Screen
         //
         if ( Gdx.input.justTouched() )
         {
-            game.setScreen( game.startScreen );
+            game.setScreen( game.gameScreen );
         }
 
         //

@@ -5,29 +5,34 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Timer;
 
 import java.util.ArrayList;
 
-import static java.lang.Thread.sleep;
-
-public class ControlsScreen2 implements Screen
+public class GameScreen implements Screen
 {
     final FlipMatch game;
 
     private OrthographicCamera camera;
 
     private FlipCard[] flipCards = new FlipCard[16];
-    private int flippedCount = 0;
 
     private Timer flippedTimer;
     private Timer.Task flippedTimerTask;
     private ArrayList<FlipCard> lastFlipped = new ArrayList< FlipCard >();
 
-    public ControlsScreen2( final FlipMatch game )
+    private Button questionMarkButton;
+    private Button pauseButton;
+
+    private Label timeLabel;
+    private Label ellapsedLabel;
+
+    public GameScreen( final FlipMatch game )
     {
         this.game = game;
         camera = new OrthographicCamera();
@@ -35,16 +40,20 @@ public class ControlsScreen2 implements Screen
 
         //Set Up Random Card Colors
         Color[] colors = new Color[16];
-        for( int i = 0; i < colors.length; i++ )
+
+        for( int i = 0; i < colors.length; i+= 2 )
         {//Initialize colors
-            Color randomColor = HSL.toRGB( MathUtils.random( 0f, 16f ) / 16f
-                                            ,game.cardSaturation
-                                            ,game.cardLightness
-                                            ,1f
+            Color color = HSL.toRGB( (float)i / colors.length
+                ,game.cardSaturation
+                ,game.cardLightness
+                ,1f
             );
 
-            colors[i] = randomColor;
+            colors[i] = color;
+            colors[i+1] = color;
+
         }
+
         for ( int i = 0; i < colors.length; i++ )
         {//Fisher–Yates Shuffle colors
             int r = i + (int)( Math.random() * ( colors.length - i ) );
@@ -67,18 +76,28 @@ public class ControlsScreen2 implements Screen
             }
         }
 
+        //Set up Timer task
         flippedTimerTask = new Timer.Task()
         {
             @Override
             public void run()
             {
-                for( FlipCard flipCard : lastFlipped )
+                //Hide the last two cards
+                for( int i = lastFlipped.size() - 2; i < lastFlipped.size(); i++ )
                 {
-                    flipCard.flipped = false;
+                    lastFlipped.get( i ).flipped = false;
                 }
-                flippedCount++;
             }
         };
+
+        //Set up Buttons
+        questionMarkButton = new Button( game, game.fontReg32, "?", 350, 100 );
+        pauseButton = new Button( game, game.fontReg32, "ll", 360f + questionMarkButton.width, 100 );
+
+        //Set up Labels
+        timeLabel = new Label( game, game.fontReg32, "Time: ", 100f, 100f );
+        ellapsedLabel = new Label( game, game.fontReg32, "0:00", 100f + timeLabel.getWidth(), 100f );
+
     }
     @Override
     public void render( float delta )
@@ -88,37 +107,37 @@ public class ControlsScreen2 implements Screen
         //
         if( flippedTimerTask.isScheduled() ) return;
 
-        if( flippedCount == 2 )
-        {
-           Timer.schedule( flippedTimerTask, 1f);
-        }
-
         if ( Gdx.input.justTouched() )
         {
-            if ( flippedCount < 2 )
-            {
-                //Get touch coords and convert them to game space
-                Vector3 touchPos = new Vector3();
-                touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-                camera.unproject(touchPos);
+            //Get touch coords and convert them to game space
+            Vector3 touchPos = new Vector3();
+            touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+            camera.unproject(touchPos);
 
-                //Check if any card has been touched
-                for( FlipCard flipCard : flipCards )
+            //Check if any card has been touched
+            for( FlipCard flipCard : flipCards )
+            {
+                if( flipCard.isTouched( touchPos.x, touchPos.y ) && !flipCard.flipped )
                 {
-                    if( flipCard.isTouched( touchPos.x, touchPos.y ) && !flipCard.flipped )
+                    flipCard.flipped = true;
+                    lastFlipped.add( flipCard );
+
+                    //Check if an even number of cards has been flipped
+                    if( lastFlipped.size() % 2 == 0 )
                     {
-                        flipCard.flipped = true;
-                        flippedCount ++;
-                        lastFlipped.add( flipCard );
-                        break;
+                        //Check if the last two flipped cards are not the same color
+                        int end = lastFlipped.size() - 1;
+                        if( lastFlipped.get( end ).flippedColor != lastFlipped.get( end - 1 ).flippedColor )
+                        {
+                            Timer.schedule( flippedTimerTask, 0.8f );
+                        }
                     }
+
+                    break;
                 }
             }
-            else if ( flippedCount > 2 )
-            {
-                game.setScreen( game.controlsScreen3 );
-                dispose();
-            }
+
+            //Check if any button has been touched
         }
 
         //
@@ -138,34 +157,13 @@ public class ControlsScreen2 implements Screen
                 flipCard.draw( game.batch );
             }
 
-            //Text
-            if( flippedCount < 2 )
-            {
-                game.drawMultiLineFontFromCenterRelative(
-                        game.batch
-                        , game.fontReg32
-                        , "When two flipped cards\ndon't match..."
-                        , 0.5f
-                        , 0.2f
-                        , BitmapFont.HAlignment.CENTER
-                );
-            }
-            else if( flippedCount > 2 )
-            {
-                game.drawMultiLineFontFromCenterRelative(
-                        game.batch
-                        , game.fontReg32
-                        , "They flip back!"
-                        , 0.5f
-                        , 0.2f
-                        , BitmapFont.HAlignment.CENTER
-                );
-            }
-
-
             //Time
+            timeLabel.draw( game.batch );
+            ellapsedLabel.draw( game.batch );
 
             //Buttons
+            questionMarkButton.draw( game.batch );
+            pauseButton.draw( game.batch );
         }
         game.batch.end();
     }
@@ -203,11 +201,6 @@ public class ControlsScreen2 implements Screen
     @Override
     public void dispose()
     {
-        flippedCount = 0;
-        for( FlipCard flipCard : flipCards )
-        {
-            flipCard.flipped = false;
-        }
-        lastFlipped.clear();
+
     }
 }

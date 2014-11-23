@@ -26,12 +26,13 @@ public class FlipMatch extends Game
 	public ControlsScreen controlsScreen;
 	public ControlsScreen2 controlsScreen2;
 	public ControlsScreen3 controlsScreen3;
+	public GameScreen gameScreen;
 
 	public SpriteBatch batch;
 
 	//Color Defaults
-	public float cardSaturation = 0.8f;
-	public float cardLightness = 0.8f;
+	public float cardSaturation = 0.95f;
+	public float cardLightness = 0.75f;
 	
 	@Override
 	public void create()
@@ -48,7 +49,7 @@ public class FlipMatch extends Game
 		controlsScreen = new ControlsScreen( this );
 		controlsScreen2 = new ControlsScreen2( this );
 		controlsScreen3 = new ControlsScreen3( this );
-
+		gameScreen = new GameScreen( this );
 
 		//Init Textures
 		unflippedFace = new Texture( Gdx.files.internal("Unflipped.png") );
@@ -57,7 +58,7 @@ public class FlipMatch extends Game
 		//Batch
 		batch = new SpriteBatch();
 
-		this.setScreen( startScreen );
+		this.setScreen( gameScreen );
 
 
 	}
