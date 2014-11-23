@@ -109,11 +109,20 @@ public class ControlsScreen implements Screen
             {
                 game.drawMultiLineFontFromCenterRelative(
                         game.batch
-                        , game.fontReg32
-                        , "When the cards match\nthey stay flipped!"
-                        , 0.5f
-                        , 0.2f
-                        , BitmapFont.HAlignment.CENTER
+                        ,game.fontReg32
+                        ,"When the cards match\nthey stay flipped!"
+                        ,0.5f
+                        ,0.2f
+                        ,BitmapFont.HAlignment.CENTER
+                );
+
+                game.drawMultiLineFontFromCenterRelative(
+                        game.batch
+                        ,game.fontReg14
+                        ,"Tap anywhere to continue"
+                        ,0.5f
+                        ,0.05f
+                        ,BitmapFont.HAlignment.CENTER
                 );
             }
 

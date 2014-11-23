@@ -91,13 +91,21 @@ public class ControlsScreen3 implements Screen
             //Text
             game.drawMultiLineFontFromCenterRelative(
                     game.batch
-                    , game.fontReg32
-                    , "Flip all matching cards\nto win the game!"
-                    , 0.5f
-                    , 0.2f
-                    , BitmapFont.HAlignment.CENTER
+                    ,game.fontReg32
+                    ,"Flip all matching cards\nto win the game!"
+                    ,0.5f
+                    ,0.2f
+                    ,BitmapFont.HAlignment.CENTER
             );
 
+            game.drawMultiLineFontFromCenterRelative(
+                    game.batch
+                    ,game.fontReg14
+                    ,"Tap anywhere to continue"
+                    ,0.5f
+                    ,0.05f
+                    ,BitmapFont.HAlignment.CENTER
+            );
 
             //Time
 

@@ -21,7 +21,6 @@ public class ControlsScreen2 implements Screen
     private OrthographicCamera camera;
 
     private FlipCard[] flipCards = new FlipCard[16];
-    private int flippedCount = 0;
 
     private Timer flippedTimer;
     private Timer.Task flippedTimerTask;
@@ -76,7 +75,6 @@ public class ControlsScreen2 implements Screen
                 {
                     flipCard.flipped = false;
                 }
-                flippedCount++;
             }
         };
     }
@@ -86,35 +84,32 @@ public class ControlsScreen2 implements Screen
         //
         // Update
         //
-        if( flippedTimerTask.isScheduled() ) return;
 
-        if( flippedCount == 2 )
+        if( !flippedTimerTask.isScheduled() && Gdx.input.justTouched() )
         {
-           Timer.schedule( flippedTimerTask, 1f);
-        }
+            //Get touch coords and convert them to game space
+            Vector3 touchPos = new Vector3();
+            touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+            camera.unproject(touchPos);
 
-        if ( Gdx.input.justTouched() )
-        {
-            if ( flippedCount < 2 )
+            if ( lastFlipped.size() < 2 )
             {
-                //Get touch coords and convert them to game space
-                Vector3 touchPos = new Vector3();
-                touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-                camera.unproject(touchPos);
-
                 //Check if any card has been touched
                 for( FlipCard flipCard : flipCards )
                 {
                     if( flipCard.isTouched( touchPos.x, touchPos.y ) && !flipCard.flipped )
                     {
                         flipCard.flipped = true;
-                        flippedCount ++;
                         lastFlipped.add( flipCard );
+                        if( lastFlipped.size() > 0 && lastFlipped.size() % 2 == 0 )
+                        {
+                            Timer.schedule( flippedTimerTask, 1.5f );
+                        }
                         break;
                     }
                 }
             }
-            else if ( flippedCount > 2 )
+            else if ( lastFlipped.size() >= 2 )
             {
                 game.setScreen( game.controlsScreen3 );
                 dispose();
@@ -139,7 +134,7 @@ public class ControlsScreen2 implements Screen
             }
 
             //Text
-            if( flippedCount < 2 )
+            if ( lastFlipped.size() < 2 )
             {
                 game.drawMultiLineFontFromCenterRelative(
                         game.batch
@@ -150,22 +145,26 @@ public class ControlsScreen2 implements Screen
                         , BitmapFont.HAlignment.CENTER
                 );
             }
-            else if( flippedCount > 2 )
+            else if ( lastFlipped.size() >= 2 )
             {
                 game.drawMultiLineFontFromCenterRelative(
                         game.batch
-                        , game.fontReg32
-                        , "They flip back!"
-                        , 0.5f
-                        , 0.2f
-                        , BitmapFont.HAlignment.CENTER
+                        ,game.fontReg32
+                        ,"They flip back!"
+                        ,0.5f
+                        ,0.2f
+                        ,BitmapFont.HAlignment.CENTER
+                );
+
+                game.drawMultiLineFontFromCenterRelative(
+                        game.batch
+                        ,game.fontReg14
+                        ,"Tap anywhere to continue"
+                        ,0.5f
+                        ,0.05f
+                        ,BitmapFont.HAlignment.CENTER
                 );
             }
-
-
-            //Time
-
-            //Buttons
         }
         game.batch.end();
     }
@@ -203,7 +202,6 @@ public class ControlsScreen2 implements Screen
     @Override
     public void dispose()
     {
-        flippedCount = 0;
         for( FlipCard flipCard : flipCards )
         {
             flipCard.flipped = false;

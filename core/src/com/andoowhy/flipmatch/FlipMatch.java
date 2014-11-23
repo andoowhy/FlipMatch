@@ -14,6 +14,7 @@ public class FlipMatch extends Game
 	public final int screenHeight = 800;
 
 	//Fonts
+	public BitmapFont fontReg14;
 	public BitmapFont fontReg32;
 	public BitmapFont fontBlk100;
 
@@ -38,6 +39,9 @@ public class FlipMatch extends Game
 	public void create()
 	{
 		//Fonts
+		fontReg14 = generateFont( "Brandon_reg.otf", 14 );
+		fontReg14.setColor( 0.2f, 0.2f, 0.2f, 1.0f );
+
 		fontReg32 = generateFont( "Brandon_reg.otf", 32 );
 		fontReg32.setColor( 0.2f, 0.2f, 0.2f, 1.0f );
 
@@ -59,8 +63,7 @@ public class FlipMatch extends Game
 		batch = new SpriteBatch();
 		batch.enableBlending();
 
-		this.setScreen( gameScreen );
-
+		this.setScreen( startScreen );
 
 	}
 
