@@ -2,14 +2,11 @@ package com.andoowhy.flipmatch;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Timer;
 
 import java.util.ArrayList;
@@ -22,15 +19,27 @@ public class GameScreen implements Screen
 
     private FlipCard[] flipCards = new FlipCard[16];
 
+    //Flipped Timer
     private Timer flippedTimer;
     private Timer.Task flippedTimerTask;
     private ArrayList<FlipCard> lastFlipped = new ArrayList< FlipCard >();
 
+    //Buttons
     private Button questionMarkButton;
     private Button pauseButton;
+    private Button resumeButton;
+    private Button restartButton;
 
+    //Labels
     private Label timeLabel;
-    private Label ellapsedLabel;
+    private Label elapsedLabel;
+    private float elapsedTime;
+    private Label pausedLabel;
+
+    //Textures
+    private Texture pauseMenuBG;
+
+    private boolean paused = true;
 
     public GameScreen( final FlipMatch game )
     {
@@ -91,12 +100,82 @@ public class GameScreen implements Screen
         };
 
         //Set up Buttons
-        questionMarkButton = new Button( game, game.fontReg32, "?", 350, 100 );
-        pauseButton = new Button( game, game.fontReg32, "ll", 360f + questionMarkButton.width, 100 );
+        questionMarkButton = new Button(
+                game
+                ,game.fontReg32
+                ,"?"
+                ,350
+                ,100
+        );
+        pauseButton = new Button(
+                game
+                ,game.fontReg32
+                ,"ll"
+                ,360f + questionMarkButton.width
+                ,100
+        );
+
 
         //Set up Labels
-        timeLabel = new Label( game, game.fontReg32, "Time: ", 100f, 100f );
-        ellapsedLabel = new Label( game, game.fontReg32, "0:00", 100f + timeLabel.getWidth(), 100f );
+        timeLabel = new Label(
+                game
+                ,game.fontReg32
+                ,"Time: "
+                ,100f
+                ,100f + pauseButton.margin + pauseButton.border
+        );
+        elapsedLabel = new Label(
+                game
+                ,game.fontReg32
+                ,"0:00"
+                ,100f + timeLabel.getWidth()
+                ,100f + pauseButton.margin + pauseButton.border
+        );
+
+        //
+        // Pause Menu
+        //
+        {
+            Pixmap pixmap = new Pixmap( MathUtils.ceil( game.screenWidth ), MathUtils.ceil( game.screenHeight ), Pixmap.Format.RGB888 );
+            pixmap.setColor( new Color( 1f, 1f, 1f, 1f ) );
+            pixmap.fillRectangle( 0, 0, pixmap.getWidth(), pixmap.getHeight() );
+            pauseMenuBG = new Texture( pixmap );
+        }
+        {
+            String resumeText = "Resume";
+            BitmapFont.TextBounds bounds = game.fontReg32.getBounds( resumeText );
+            resumeButton = new Button(
+                    game
+                    ,game.fontReg32
+                    ,resumeText
+                    ,game.screenWidth * 0.5f - bounds.width / 2f
+                    ,game.screenHeight * 0.5f - bounds.height / 2f
+            );
+        }
+        {
+            String restartText = "Restart";
+            BitmapFont.TextBounds bounds = game.fontReg32.getBounds( restartText );
+            restartButton = new Button(
+                    game
+                    ,game.fontReg32
+                    ,restartText
+                    ,game.screenWidth * 0.5f - bounds.width / 2f
+                    ,game.screenHeight * 0.4f - bounds.height / 2f
+            );
+        }
+        {
+            String pausedText = "Paused";
+            BitmapFont.TextBounds bounds = game.fontReg32.getBounds( pausedText );
+            pausedLabel = new Label(
+                    game
+                    ,game.fontReg32
+                    ,pausedText
+                    ,game.screenWidth * 0.5f - bounds.width / 2f
+                    ,game.screenHeight * 0.7f - bounds.height / 2f
+            );
+        }
+
+
 
     }
     @Override
@@ -105,39 +184,68 @@ public class GameScreen implements Screen
         //
         // Update
         //
-        if( flippedTimerTask.isScheduled() ) return;
-
-        if ( Gdx.input.justTouched() )
+        if ( !paused )
         {
-            //Get touch coords and convert them to game space
-            Vector3 touchPos = new Vector3();
-            touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-            camera.unproject(touchPos);
+            elapsedTime += delta;
+        }
 
-            //Check if any card has been touched
-            for( FlipCard flipCard : flipCards )
+        if( !flippedTimerTask.isScheduled() )
+        {
+            if ( Gdx.input.justTouched() )
             {
-                if( flipCard.isTouched( touchPos.x, touchPos.y ) && !flipCard.flipped )
-                {
-                    flipCard.flipped = true;
-                    lastFlipped.add( flipCard );
+                //Get touch coords and convert them to game space
+                Vector3 touchPos = new Vector3();
+                touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+                camera.unproject(touchPos);
 
-                    //Check if an even number of cards has been flipped
-                    if( lastFlipped.size() % 2 == 0 )
+                if( !paused )
+                {   //Check if any card has been touched
+                    for( FlipCard flipCard : flipCards )
                     {
-                        //Check if the last two flipped cards are not the same color
-                        int end = lastFlipped.size() - 1;
-                        if( lastFlipped.get( end ).flippedColor != lastFlipped.get( end - 1 ).flippedColor )
+                        if( flipCard.isTouched( touchPos.x, touchPos.y ) && !flipCard.flipped )
                         {
-                            Timer.schedule( flippedTimerTask, 0.8f );
+                            flipCard.flipped = true;
+                            lastFlipped.add( flipCard );
+
+                            //Check if an even number of cards has been flipped
+                            if( lastFlipped.size() % 2 == 0 )
+                            {
+                                //Check if the last two flipped cards are not the same color
+                                int end = lastFlipped.size() - 1;
+                                if( lastFlipped.get( end ).flippedColor != lastFlipped.get( end - 1 ).flippedColor )
+                                {
+                                    Timer.schedule( flippedTimerTask, 0.8f );
+                                }
+                            }
+
+                            break;
                         }
                     }
 
-                    break;
+                    //Check if any button has been touched
+                    if( questionMarkButton.isTouched( touchPos.x, touchPos.y ) )
+                    {
+                        game.setScreen( game.controlsScreen );
+                    }
+
+                    if( pauseButton.isTouched( touchPos.x, touchPos.y ) )
+                    {
+                        paused = true;
+                    }
+                }
+                else
+                {//Pause Menu
+                    if( resumeButton.isTouched( touchPos.x, touchPos.y ) )
+                    {
+                        paused = false;
+                    }
+
+                    if( restartButton.isTouched( touchPos.x, touchPos.y ) )
+                    {
+                        dispose();
+                    }
                 }
             }
-
-            //Check if any button has been touched
         }
 
         //
@@ -159,11 +267,28 @@ public class GameScreen implements Screen
 
             //Time
             timeLabel.draw( game.batch );
-            ellapsedLabel.draw( game.batch );
+            String elapsedLabeled = Integer.toString( (int)( elapsedTime / 60f ) );
+            elapsedLabeled += ":";
+            elapsedLabeled += String.format( "%02d", (int)( elapsedTime % 60 ));
+            elapsedLabel.setText( elapsedLabeled );
+            elapsedLabel.draw( game.batch );
 
             //Buttons
             questionMarkButton.draw( game.batch );
             pauseButton.draw( game.batch );
+
+            if( paused )
+            {
+                {
+                    Color oldColor = game.batch.getColor();
+                    game.batch.setColor( oldColor.r, oldColor.g, oldColor.b, 0.9f );
+                    game.batch.draw( pauseMenuBG, 0f, 0f );
+                    game.batch.setColor( oldColor );
+                }
+                resumeButton.draw( game.batch );
+                restartButton.draw( game.batch );
+                pausedLabel.draw( game.batch );
+            }
         }
         game.batch.end();
     }
@@ -189,7 +314,7 @@ public class GameScreen implements Screen
     @Override
     public void pause()
     {
-
+        paused = true;
     }
 
     @Override
@@ -201,6 +326,12 @@ public class GameScreen implements Screen
     @Override
     public void dispose()
     {
-
+        elapsedTime = 0f;
+        for( FlipCard flipCard : flipCards )
+        {
+            flipCard.flipped = false;
+        }
+        lastFlipped.clear();
+        paused = false;
     }
 }

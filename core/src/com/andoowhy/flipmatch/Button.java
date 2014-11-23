@@ -34,10 +34,10 @@ public class Button extends GUIElement
 
         Pixmap pixmap = new Pixmap( MathUtils.ceil( width ), MathUtils.ceil( height ), Pixmap.Format.RGB888 );
         //Border
-        pixmap.setColor( new Color( 0.2f, 0.2f, 0.2f, 1f ) ); //red
+        pixmap.setColor( new Color( 0.2f, 0.2f, 0.2f, 1f ) );
         pixmap.fillRectangle( 0, 0, MathUtils.ceil( width ), MathUtils.ceil( height ) );
         //Fill
-        pixmap.setColor( new Color( 0.9f, 0.9f, 0.9f, 1f ) ); //blue
+        pixmap.setColor( new Color( 0.9f, 0.9f, 0.9f, 1f ) );
         pixmap.fillRectangle( border, border, MathUtils.ceil( width ) - 2 * border,  MathUtils.ceil( height ) - 2 * border );
 
         buttonTexture = new Texture( pixmap );
@@ -50,7 +50,7 @@ public class Button extends GUIElement
         font.draw( batch, text, x + border + margin, y + bounds.height + border + margin );
     }
 
-    private boolean isTouched( float touchX, float touchY )
+    public boolean isTouched( float touchX, float touchY )
     {
         if( touchX >= x && touchX < x + width )
         {

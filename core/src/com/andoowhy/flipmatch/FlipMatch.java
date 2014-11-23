@@ -57,6 +57,7 @@ public class FlipMatch extends Game
 
 		//Batch
 		batch = new SpriteBatch();
+		batch.enableBlending();
 
 		this.setScreen( gameScreen );
 
