@@ -29,6 +29,7 @@ public class GameScreen implements Screen
     private Button pauseButton;
     private Button resumeButton;
     private Button restartButton;
+    private Button highScoresButton;
 
     //Labels
     private Label timeLabel;
@@ -167,6 +168,17 @@ public class GameScreen implements Screen
             );
         }
         {
+            String highScoresText = "High Scores";
+            BitmapFont.TextBounds bounds = game.fontReg32.getBounds( highScoresText );
+            highScoresButton = new Button(
+                    game
+                    ,game.fontReg32
+                    ,highScoresText
+                    ,game.screenWidth * 0.5f - bounds.width / 2f
+                    ,game.screenHeight * 0.3f - bounds.height / 2f
+            );
+        }
+        {
             String pausedText = "Paused";
             BitmapFont.TextBounds bounds = game.fontBlk100.getBounds( pausedText );
             pausedLabel = new Label(
@@ -200,7 +212,6 @@ public class GameScreen implements Screen
         //
         // Update
         //
-
         if ( !paused )
         {
             elapsedTime += delta;
@@ -256,6 +267,11 @@ public class GameScreen implements Screen
                     if( resumeButton.isTouched( touchPos.x, touchPos.y ) )
                     {
                         paused = false;
+                    }
+
+                    if( highScoresButton.isTouched( touchPos.x, touchPos.y ) )
+                    {
+                        game.setScreen( game.highScoreScreen );
                     }
 
                     if( restartButton.isTouched( touchPos.x, touchPos.y ) )
@@ -323,6 +339,7 @@ public class GameScreen implements Screen
                 }
                 resumeButton.draw( game.batch );
                 restartButton.draw( game.batch );
+                highScoresButton.draw( game.batch );
                 pausedLabel.draw( game.batch );
             }
         }

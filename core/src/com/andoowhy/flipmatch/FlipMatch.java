@@ -2,6 +2,7 @@ package com.andoowhy.flipmatch;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -28,12 +29,17 @@ public class FlipMatch extends Game
 	public ControlsScreen2 controlsScreen2;
 	public ControlsScreen3 controlsScreen3;
 	public GameScreen gameScreen;
+	public HighScoreScreen highScoreScreen;
 
+	//Sprite Batcher
 	public SpriteBatch batch;
 
 	//Color Defaults
 	public float cardSaturation = 0.95f;
 	public float cardLightness = 0.75f;
+
+	//Save Game Preferences
+	public Preferences scores;
 	
 	@Override
 	public void create()
@@ -54,6 +60,7 @@ public class FlipMatch extends Game
 		controlsScreen2 = new ControlsScreen2( this );
 		controlsScreen3 = new ControlsScreen3( this );
 		gameScreen = new GameScreen( this );
+		highScoreScreen = new HighScoreScreen( this );
 
 		//Init Textures
 		unflippedFace = new Texture( Gdx.files.internal("Unflipped.png") );
@@ -62,6 +69,9 @@ public class FlipMatch extends Game
 		//Batch
 		batch = new SpriteBatch();
 		batch.enableBlending();
+
+		//Prefs
+		scores = Gdx.app.getPreferences("scores");
 
 		this.setScreen( startScreen );
 

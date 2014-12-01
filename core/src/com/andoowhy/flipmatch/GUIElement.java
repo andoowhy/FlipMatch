@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public abstract class GUIElement
 {
-    private final FlipMatch game;
+    public final FlipMatch game;
     public float x;
     public float y;
 
