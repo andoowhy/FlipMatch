@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.math.Vector3;
 
 public class StartScreen implements Screen
 {
@@ -11,11 +13,37 @@ public class StartScreen implements Screen
 
     private OrthographicCamera camera;
 
+    private Button tutorialButton;
+    private Button startButton;
+
     public StartScreen( final FlipMatch game )
     {
         this.game = game;
         camera = new OrthographicCamera();
         camera.setToOrtho( false, game.screenWidth, game.screenHeight );
+
+        {
+            String tutorialText = "Tutorial";
+            BitmapFont.TextBounds bounds = game.fontReg32.getBounds( tutorialText );
+            tutorialButton = new Button(
+                    game
+                    ,game.fontReg32
+                    ,tutorialText
+                    ,game.screenWidth * 0.5f - bounds.width / 2f
+                    ,game.screenHeight * 0.25f - bounds.height / 2f
+            );
+        }
+        {
+            String startText = "Start";
+            BitmapFont.TextBounds bounds = game.fontReg32.getBounds( startText );
+            startButton = new Button(
+                    game
+                    ,game.fontReg32
+                    ,startText
+                    ,game.screenWidth * 0.5f - bounds.width / 2f
+                    ,game.screenHeight * 0.15f - bounds.height / 2f
+            );
+        }
     }
     @Override
     public void render( float delta )
@@ -34,20 +62,29 @@ public class StartScreen implements Screen
                                             ,0.5f
                                             ,0.5f );
 
-            game.drawFontFromCenterRelative( game.batch
-                                            ,game.fontReg32
-                                            ,"Tap Anywhere to Start"
-                                            ,0.5f
-                                            ,0.2f );
-
-
+            startButton.draw( game.batch );
+            tutorialButton.draw( game.batch );
         }
         game.batch.end();
 
         if ( Gdx.input.justTouched() )
         {
-            game.setScreen( game.controlsScreen );
-            dispose();
+            //Get touch coords and convert them to game space
+            Vector3 touchPos = new Vector3();
+            touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+            camera.unproject(touchPos);
+
+            if( startButton.isTouched( touchPos.x, touchPos.y ) )
+            {
+                game.setScreen( game.gameScreen );
+                dispose();
+            }
+
+            if( tutorialButton.isTouched( touchPos.x, touchPos.y ) )
+            {
+                game.setScreen( game.controlsScreen );
+                dispose();
+            }
         }
     }
 
