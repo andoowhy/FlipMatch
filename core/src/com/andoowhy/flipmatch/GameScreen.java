@@ -22,13 +22,14 @@ public class GameScreen implements Screen
     //Flipped Timer
     private Timer flippedTimer;
     private Timer.Task flippedTimerTask;
-    private ArrayList<FlipCard> lastFlipped = new ArrayList< FlipCard >();
+    private ArrayList<FlipCard> lastFlipped = new ArrayList<FlipCard>();
 
     //Buttons
     private Button questionMarkButton;
     private Button pauseButton;
     private Button resumeButton;
     private Button restartButton;
+    private Button restartFromWinButton;
     private Button highScoresButton;
 
     //Labels
@@ -50,28 +51,7 @@ public class GameScreen implements Screen
         camera.setToOrtho( false, game.screenWidth, game.screenHeight );
 
         //Set Up Random Card Colors
-        Color[] colors = new Color[16];
-
-        for( int i = 0; i < colors.length; i+= 2 )
-        {//Initialize colors
-            Color color = HSL.toRGB( (float)i / colors.length
-                ,game.cardSaturation
-                ,game.cardLightness
-                ,1f
-            );
-
-            colors[i] = color;
-            colors[i+1] = color;
-
-        }
-
-        for ( int i = 0; i < colors.length; i++ )
-        {//Fisher–Yates Shuffle colors
-            int r = i + (int)( Math.random() * ( colors.length - i ) );
-            Color tmp = colors[r];
-            colors[r] = colors[i];
-            colors[i] = tmp;
-        }
+        Color[] colors = randomColors();
 
         //Set up Cards
         for( int i = 0; i < 4; i++ )
@@ -204,15 +184,56 @@ public class GameScreen implements Screen
                     ,game.screenHeight * 0.7f - bounds.height / 2f
             );
         }
+        {
+            String restartText = "Restart";
+            BitmapFont.TextBounds bounds = game.fontReg32.getBounds( restartText );
+            restartFromWinButton = new Button(
+                    game
+                    ,game.fontReg32
+                    ,restartText
+                    ,game.screenWidth * 0.5f - bounds.width / 2f
+                    ,game.screenHeight * 0.4f - bounds.height / 2f
+            );
+        }
 
     }
+
+    private Color[] randomColors()
+    {
+        //Set Up Random Card Colors
+        Color[] colors = new Color[16];
+
+        for( int i = 0; i < colors.length; i+= 2 )
+        {//Initialize colors
+            Color color = HSL.toRGB( (float)i / colors.length
+                    ,game.cardSaturation
+                    ,game.cardLightness
+                    ,1f
+            );
+
+            colors[i] = color;
+            colors[i+1] = color;
+
+        }
+
+        for ( int i = 0; i < colors.length; i++ )
+        {//Fisher–Yates Shuffle colors
+            int r = i + (int)( Math.random() * ( colors.length - i ) );
+            Color tmp = colors[r];
+            colors[r] = colors[i];
+            colors[i] = tmp;
+        }
+
+        return colors;
+    }
+
     @Override
     public void render( float delta )
     {
         //
         // Update
         //
-        if ( !paused )
+        if ( !paused && lastFlipped.size() != flipCards.length  )
         {
             elapsedTime += delta;
         }
@@ -282,8 +303,9 @@ public class GameScreen implements Screen
             }
             else if( lastFlipped.size() == flipCards.length )
             {
-                if( restartButton.isTouched( touchPos.x, touchPos.y ) )
+                if( restartFromWinButton.isTouched( touchPos.x, touchPos.y ) )
                 {
+                    game.scores.addScore( elapsedTime );
                     dispose();
                 }
             }
@@ -385,6 +407,13 @@ public class GameScreen implements Screen
             flipCard.flipped = false;
         }
         lastFlipped.clear();
+
+        Color[] colors = randomColors();
+        for ( int i = 0; i < flipCards.length; i++ )
+        {
+            flipCards[i].flippedColor = colors[i];
+        }
+
         paused = false;
     }
 }

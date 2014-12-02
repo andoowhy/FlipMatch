@@ -39,7 +39,7 @@ public class FlipMatch extends Game
 	public float cardLightness = 0.75f;
 
 	//Save Game Preferences
-	public Preferences scores;
+	public Scores scores;
 	
 	@Override
 	public void create()
@@ -71,7 +71,7 @@ public class FlipMatch extends Game
 		batch.enableBlending();
 
 		//Prefs
-		scores = Gdx.app.getPreferences("scores");
+		scores = new Scores( this );
 
 		this.setScreen( startScreen );
 

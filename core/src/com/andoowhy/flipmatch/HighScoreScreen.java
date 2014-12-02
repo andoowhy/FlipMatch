@@ -2,11 +2,9 @@ package com.andoowhy.flipmatch;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 
 public class HighScoreScreen implements Screen
@@ -17,7 +15,6 @@ public class HighScoreScreen implements Screen
 
     private Label highLabel;
     private Label scoresLabel;
-
 
     private Button backButton;
 
@@ -59,6 +56,8 @@ public class HighScoreScreen implements Screen
                     ,game.screenWidth * 0.5f - bounds.width / 2f
                     ,game.screenHeight * 0.1f - bounds.height / 2f
             );
+            backButton.x -= backButton.margin;
+            backButton.x -= backButton.border;
         }
     }
     @Override
@@ -93,6 +92,9 @@ public class HighScoreScreen implements Screen
         {
             highLabel.draw( game.batch );
             scoresLabel.draw( game.batch );
+
+            game.scores.draw( game.batch );
+
             backButton.draw( game.batch );
         }
         game.batch.end();

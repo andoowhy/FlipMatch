@@ -75,7 +75,6 @@ public class ControlsScreen implements Screen
             }
         }
 
-
         //
         // Drawing
         //
