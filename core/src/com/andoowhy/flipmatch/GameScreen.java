@@ -135,6 +135,8 @@ public class GameScreen implements Screen
                     ,game.screenWidth * 0.5f - bounds.width / 2f
                     ,game.screenHeight * 0.5f - bounds.height / 2f
             );
+            resumeButton.x -= resumeButton.border;
+            resumeButton.x -= resumeButton.margin;
         }
         {
             String restartText = "Restart";
@@ -146,6 +148,8 @@ public class GameScreen implements Screen
                     ,game.screenWidth * 0.5f - bounds.width / 2f
                     ,game.screenHeight * 0.4f - bounds.height / 2f
             );
+            restartButton.x -= restartButton.border;
+            restartButton.x -= restartButton.margin;
         }
         {
             String highScoresText = "High Scores";
@@ -157,6 +161,8 @@ public class GameScreen implements Screen
                     ,game.screenWidth * 0.5f - bounds.width / 2f
                     ,game.screenHeight * 0.3f - bounds.height / 2f
             );
+            highScoresButton.x -= highScoresButton.border;
+            highScoresButton.x -= highScoresButton.margin;
         }
         {
             String pausedText = "Paused";
@@ -194,6 +200,8 @@ public class GameScreen implements Screen
                     ,game.screenWidth * 0.5f - bounds.width / 2f
                     ,game.screenHeight * 0.4f - bounds.height / 2f
             );
+            restartFromWinButton.x -= restartFromWinButton.border;
+            restartFromWinButton.x -= restartFromWinButton.margin;
         }
 
     }

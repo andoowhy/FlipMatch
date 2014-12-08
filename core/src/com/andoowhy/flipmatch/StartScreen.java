@@ -32,6 +32,9 @@ public class StartScreen implements Screen
                     ,game.screenWidth * 0.5f - bounds.width / 2f
                     ,game.screenHeight * 0.25f - bounds.height / 2f
             );
+            tutorialButton.x -= tutorialButton.border;
+            tutorialButton.x -= tutorialButton.margin;
+
         }
         {
             String startText = "Start";
@@ -43,6 +46,9 @@ public class StartScreen implements Screen
                     ,game.screenWidth * 0.5f - bounds.width / 2f
                     ,game.screenHeight * 0.15f - bounds.height / 2f
             );
+            startButton.x -= startButton.border;
+            startButton.x -= startButton.margin;
+
         }
     }
     @Override
